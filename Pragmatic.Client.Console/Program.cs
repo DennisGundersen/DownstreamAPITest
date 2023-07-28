@@ -26,6 +26,8 @@ namespace Pragmatic.Client.CLI
                 options.RelativePath = "Values";
             });
             Console.WriteLine($"result = {result?.Count()}");
+            Console.WriteLine("              At the end of tracks and trails, dead men tell no tales              ");
+            Console.ReadLine();
         }
     }
 }
