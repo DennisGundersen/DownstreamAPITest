@@ -34,7 +34,7 @@ else
                         options.RelativePath = "values"; // NB! "api/" is included in the default BaseAddress
                     }
             );
-            
+
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 apiResult = await response.Content.ReadAsStringAsync();
