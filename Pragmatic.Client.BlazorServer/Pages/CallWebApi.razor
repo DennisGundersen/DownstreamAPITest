@@ -1,5 +1,5 @@
 @page "/callwebapi"
-
+@attribute [Authorize]
 @inject IDownstreamApi downstreamAPI
 @inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
 @inject APIOptions apiOptions
@@ -15,18 +15,20 @@
 else
 {
     <h2>API Result</h2>
-    @apiResult
+    @foreach(var item in apiResult)
+    {
+        <p>@(item.Name) [#@(item.Id)]</p>
+    }
+
 }
 
 @code {
-    private HttpResponseMessage response;
-    private string apiResult;
-
+    private IEnumerable<ValueModel> apiResult = null;
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            response = await downstreamAPI.CallApiForUserAsync(
+            apiResult = await downstreamAPI.GetForUserAsync<IEnumerable<ValueModel>>(
                     "DownstreamApi",
                     options =>
                     {
@@ -34,15 +36,7 @@ else
                         options.RelativePath = "values"; // NB! "api/" is included in the default BaseAddress
                     }
             );
-            
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                apiResult = await response.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                apiResult = "Failed to call the web API";
-            }
+
         }
         catch (Exception ex)
         {
