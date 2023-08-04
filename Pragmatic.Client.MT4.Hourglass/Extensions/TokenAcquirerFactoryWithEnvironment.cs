@@ -2,7 +2,7 @@
 using Microsoft.Identity.Web;
 using System;
 
-namespace Pragmatic.Client.CLI.Extensions
+namespace Pragmatic.Client.MT4.Hourglass.Extensions
 {
     internal class TokenAcquirerFactoryWithEnvironment : TokenAcquirerFactory
     {
@@ -16,6 +16,6 @@ namespace Pragmatic.Client.CLI.Extensions
                    .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
-        
+
     }
 }

@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Pragmatic.Client.BlazorServer-1c20220d-c8e8-4c32-aacf-66de042a8c52</UserSecretsId>
 	<WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
+	<Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

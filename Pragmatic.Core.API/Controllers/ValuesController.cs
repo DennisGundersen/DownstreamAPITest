@@ -5,6 +5,9 @@ using Microsoft.Identity.Web.Resource;
 using Pragmatic.Core.API.Models;
 using System;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace Pragmatic.Core.API.Controllers
 {
