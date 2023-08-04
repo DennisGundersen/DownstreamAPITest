@@ -26,8 +26,10 @@ namespace Pragmatic.Client.MT4.Hourglass
             provider = DependencyInjectionService.RegisterDependencyInjection();
 
             // Get the services
-            // TODO: MT4 collapses if I try to instantiate the api or mapper services
+            // TODO: MT4 collapses if I try to instantiate the api, but not the mapper services
             api = provider.GetRequiredService<IPragmaticAPIService>().GetDownstreamAPI();
+            //var test = provider.GetRequiredService<IPragmaticAPIService>();
+            //api = test.GetDownstreamAPI();
             mapper = provider.GetRequiredService<IMappingService>();
 
             Task<int> task = Task.Run<int>(async () => await GetIntManagedAsync(value, pause));
