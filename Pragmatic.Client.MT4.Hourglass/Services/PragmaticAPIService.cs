@@ -11,12 +11,14 @@ namespace Pragmatic.Client.MT4.Hourglass.Services
 
         public PragmaticAPIService()
         {
+            /*
             var tokenAcquirerFactory = TokenAcquirerFactory.GetDefaultInstance<TokenAcquirerFactoryWithEnvironment>();
             var downstreamOptions = tokenAcquirerFactory.Configuration.GetSection(Trader.ApiSectionName);
             tokenAcquirerFactory.Services.AddDownstreamApi(Trader.ApiName, downstreamOptions);
             var sp = tokenAcquirerFactory.Build();
 
             DownstreamAPI = sp.GetRequiredService<IDownstreamApi>();
+            */
         }
 
         public IDownstreamApi GetDownstreamAPI()

@@ -6,6 +6,7 @@ namespace Pragmatic.Client.MT4.Hourglass.Extensions
 {
     internal class TokenAcquirerFactoryWithEnvironment : TokenAcquirerFactory
     {
+        public const string name = "custom TokenAcquirerFactory";
         public TokenAcquirerFactoryWithEnvironment()
         {
             var builder = new ConfigurationBuilder();

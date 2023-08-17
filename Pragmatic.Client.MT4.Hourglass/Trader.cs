@@ -1,5 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Abstractions;
+using Microsoft.Identity.Web;
+using NReco.Logging.File;
+using Pragmatic.Client.MT4.Hourglass.Extensions;
 using Pragmatic.Client.MT4.Hourglass.Models;
 using Pragmatic.Client.MT4.Hourglass.Services;
 using System;
@@ -12,34 +17,44 @@ namespace Pragmatic.Client.MT4.Hourglass
 {
     public static class Trader
     {
-        public const string ApiName = "DownstreamApi";
-        public const string ApiSectionName = "DownstreamApi";
         public static IServiceProvider provider;
         private static IMappingService mapper;
         private static IDownstreamApi api;
-
+        private static ILogger logger;
+        private static ILoggerProvider loggerProvider;
 
         [UnmanagedCallersOnly(EntryPoint = "GetIntAsync")]
         public static int GetIntAsync(int value, int pause = 3)
         {
-            // Setup Dependency Injection
-            provider = DependencyInjectionService.RegisterDependencyInjection();
+            try
+            {
+                prepareEnvironment();
+                logger?.LogInformation("({0}, {1}) = {2}", value, pause, value + pause);
+                // Get the services
+                // TODO: MT4 collapses if I try to instantiate the api, but not the mapper services
 
-            // Get the services
-            // TODO: MT4 collapses if I try to instantiate the api, but not the mapper services
-            api = provider.GetRequiredService<IPragmaticAPIService>().GetDownstreamAPI();
-            //var test = provider.GetRequiredService<IPragmaticAPIService>();
-            //api = test.GetDownstreamAPI();
-            mapper = provider.GetRequiredService<IMappingService>();
+                var testLogger = provider.GetRequiredService<ILogger<IDownstreamApi>>();
+                api = provider.GetRequiredService<IDownstreamApi>();
+                //var test = provider.GetRequiredService<IPragmaticAPIService>();
+                //api = test.GetDownstreamAPI();
+                mapper = provider.GetRequiredService<IMappingService>();
 
-            Task<int> task = Task.Run<int>(async () => await GetIntManagedAsync(value, pause));
-            return task.Result;
+                Task<int> task = Task.Run<int>(async () => await GetIntManagedAsync(value, pause));
+                return task.Result;
+            }
+            catch(Exception ex) 
+            {
+                if (logger == null) return -2;
+                logger?.LogCritical(ex, "GetIntAsync Exception: ");
+            }
+            return -1;
         }
+
 
         public static async Task<int> GetIntManagedAsync(int value, int pause = 3)
         {
             await Task.Delay(pause * 1000);
-            return ++value;
+            return value + pause;
             //var values = await RegisterAccount();
             //return values;//.ToList().Count;
         }
@@ -53,11 +68,9 @@ namespace Pragmatic.Client.MT4.Hourglass
 
         public static async Task<int> RegisterAccount()
         {
-            // Setup Dependency Injection
-            provider = DependencyInjectionService.RegisterDependencyInjection();
-
+            
             // Get the services
-            api = provider.GetRequiredService<IPragmaticAPIService>().GetDownstreamAPI();
+            api = provider.GetRequiredService<IDownstreamApi>();
             mapper = provider.GetRequiredService<IMappingService>();
 
             var values = await GetValues();
@@ -73,12 +86,27 @@ namespace Pragmatic.Client.MT4.Hourglass
 
         public static async Task<IEnumerable<ValueModel>> GetValues()
         {
-            var result = await api.GetForAppAsync<IEnumerable<ValueModel>>(ApiName, options =>
+            var result = await api.GetForAppAsync<IEnumerable<ValueModel>>(DependencyInjectionService.ApiName, options =>
             {
                 options.RelativePath = "Values";
             });
 
             return result;
+        }
+
+        private static void prepareEnvironment()
+        {
+            if (logger == null)
+            {
+                loggerProvider = new FileLoggerProvider(DependencyInjectionService.BasePath + "/_HourGlass.log", new FileLoggerOptions(){ MinLevel = LogLevel.Debug, Append = true});
+                logger = loggerProvider.CreateLogger("Trader");
+            }
+
+            if (provider == null)
+            {
+                // Setup Dependency Injection
+                provider = DependencyInjectionService.RegisterDependencyInjection(loggerProvider);
+            }
         }
     }
 }
