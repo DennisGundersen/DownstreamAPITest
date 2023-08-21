@@ -42,7 +42,7 @@ namespace Pragmatic.Client.MT4.Hourglass.Services
                      */
                     .AddSingleton(loggerProvider)
                     .AddSingleton(typeof(ILogger<>), typeof(FileLoggerFactory<>));
-                ;
+                //;
 
                 serviceProvider = tokenAcquirerFactory.Build();
             }

@@ -13,7 +13,7 @@
 // Remember x86 only!
 
 #import "Pragmatic.Client.MT4.HourglassNE.dll"
-   int GetIntAsync(int a, int delay);
+   int RegisterAccountFromMT4(int a, int delay);
 #import
 
 int delayS = 4;
@@ -34,14 +34,14 @@ int OnInit()
 {
 
    int result;
-   PrintFormat("Starting GetIntAsync(%d, %d)", myInt, delayS);
-   result = GetIntAsync(myInt, delayS);
-   PrintFormat("GetIntAsync(%d, %d) returned: %d", myInt, delayS, result);
+   PrintFormat("Starting RegisterAccountFromMT4(%d, %d)", myInt, delayS);
+   result = RegisterAccountFromMT4(myInt, delayS);
+   PrintFormat("RegisterAccountFromMT4(%d, %d) returned: %d", myInt, delayS, result);
    
    delayS += 5;
-   PrintFormat("Starting GetIntAsync(%d, %d)", myInt, delayS);
-   result = GetIntAsync(myInt, delayS);
-   PrintFormat("GetIntAsync(%d, %d) returned: %d", myInt, delayS, result);
+   PrintFormat("Starting RegisterAccountFromMT4(%d, %d)", myInt, delayS);
+   result = RegisterAccountFromMT4(myInt, delayS);
+   PrintFormat("RegisterAccountFromMT4(%d, %d) returned: %d", myInt, delayS, result);
   
      
    return(INIT_SUCCEEDED);
