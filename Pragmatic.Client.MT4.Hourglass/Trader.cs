@@ -37,7 +37,7 @@ namespace Pragmatic.Client.Hourglass.MT4
         //}
 
         [UnmanagedCallersOnly(EntryPoint = "RegisterAccountFromMT4")]
-        public unsafe static int RegisterAccountFromMT4(int accountNumber,
+        public unsafe static long RegisterAccountFromMT4(int accountNumber,
             [C99Type("wchar_t *")] char* accountName,
             double tradingLotSize, double extremeTopRate, double normalTopRate,
             double preferredCenterRate, double normalBottomRate, double extremeBottomRate,
@@ -68,16 +68,27 @@ namespace Pragmatic.Client.Hourglass.MT4
             bool runWhiplashBool = MQL4Converter.ReadBool(runWhiplash);
             bool isSymbolMasterBool = MQL4Converter.ReadBool(isSymbolMaster);
 
+            
+            return RegisterAccountFromUnsafe(accountNumber, accountNameString, tradingLotSize, extremeTopRate, normalTopRate, preferredCenterRate, normalBottomRate, extremeBottomRate,
+                        testUpToRate, testDownToRate, testPipsUp, testPipsDown, maxPlacementDistance, longStabilizerSizeFactor, shortStabilizerSizeFactor, longBalancerSizeFactor, shortBalancerSizeFactor, primerSizeFactor,
+                        balancerStopLossPips, securePips, autoLotIncreaseBool, autoLotSafeEQLevel, tradeMidTermBool, takeProfit, fixedSpread, extraLongBuffer, extraShortBuffer, usePoint, autoCloseExtremesBool, warningLevel,
+                        heartbeatMonitorTimer, databaseLogTimer, runBalancersBool, runStabilizersBool, runBreakoutsBool, runPrimersBool, runWhiplashBool, isSymbolMasterBool, dataFolderString, gmtOffset, rateDecimalNumbersToShow,
+                        ask, bid, accountPercentage, maxWeight, balMinPlacementLongs, balMinPlacementShorts);
+
+        }
+
+        private static long RegisterAccountFromUnsafe(int accountNumber, string accountNameString, double tradingLotSize, double extremeTopRate, double normalTopRate, double preferredCenterRate, double normalBottomRate, double extremeBottomRate, double testUpToRate, double testDownToRate, int testPipsUp, int testPipsDown, int maxPlacementDistance, int longStabilizerSizeFactor, int shortStabilizerSizeFactor, int longBalancerSizeFactor, int shortBalancerSizeFactor, int primerSizeFactor, int balancerStopLossPips, int securePips, bool autoLotIncreaseBool, int autoLotSafeEQLevel, bool tradeMidTermBool, int takeProfit, int fixedSpread, int extraLongBuffer, int extraShortBuffer, double usePoint, bool autoCloseExtremesBool, int warningLevel, int heartbeatMonitorTimer, int databaseLogTimer, bool runBalancersBool, bool runStabilizersBool, bool runBreakoutsBool, bool runPrimersBool, bool runWhiplashBool, bool isSymbolMasterBool, string dataFolderString, int gmtOffset, int rateDecimalNumbersToShow, double ask, double bid, double accountPercentage, double maxWeight, int balMinPlacementLongs, int balMinPlacementShorts)
+        {
             try
             {
                 // Setup all the services
                 PrepareEnvironment();
-                //logger?.LogInformation("({0}: {1})", accountNumber, accountName);
-                logger?.LogInformation(accountNameString);
+                logger?.LogInformation("Register({0}: {1})", accountNumber, accountNameString);
+                //logger?.LogInformation(accountNameString);
 
                 mapper = provider.GetRequiredService<IMappingService>();
-
-                Task<int> task = Task.Run<int>(async () => await RegisterAccount(accountNumber, accountNameString, tradingLotSize, extremeTopRate, normalTopRate, preferredCenterRate, normalBottomRate, extremeBottomRate,
+                
+                Task<long> task = Task.Run<long>(async () => await RegisterAccount(accountNumber, accountNameString, tradingLotSize, extremeTopRate, normalTopRate, preferredCenterRate, normalBottomRate, extremeBottomRate,
                         testUpToRate, testDownToRate, testPipsUp, testPipsDown, maxPlacementDistance, longStabilizerSizeFactor, shortStabilizerSizeFactor, longBalancerSizeFactor, shortBalancerSizeFactor, primerSizeFactor,
                         balancerStopLossPips, securePips, autoLotIncreaseBool, autoLotSafeEQLevel, tradeMidTermBool, takeProfit, fixedSpread, extraLongBuffer, extraShortBuffer, usePoint, autoCloseExtremesBool, warningLevel,
                         heartbeatMonitorTimer, databaseLogTimer, runBalancersBool, runStabilizersBool, runBreakoutsBool, runPrimersBool, runWhiplashBool, isSymbolMasterBool, dataFolderString, gmtOffset, rateDecimalNumbersToShow,
@@ -85,11 +96,11 @@ namespace Pragmatic.Client.Hourglass.MT4
 
                 return task.Result;
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                if (logger == null) 
-                { 
-                    return -2; 
+                if (logger == null)
+                {
+                    return -2;
                 }
                 logger?.LogCritical(ex, "RegisterAccountFromMT4 Exception: ");
             }
@@ -104,7 +115,7 @@ namespace Pragmatic.Client.Hourglass.MT4
         // 3. Add recieved data to static Account entity
         // 4. Get the LastUpdate from the API using AccountId
         // 5. Return the LastUpdate int (or error) to MT4 EA
-        public static async Task<int> RegisterAccount(int accountNumber, string accountName, double tradingLotSize, double extremeTopRate, double normalTopRate, double preferredCenterRate, double normalBottomRate, double extremeBottomRate,
+        public static async Task<long> RegisterAccount(int accountNumber, string accountName, double tradingLotSize, double extremeTopRate, double normalTopRate, double preferredCenterRate, double normalBottomRate, double extremeBottomRate,
             double testUpToRate, double testDownToRate, int testPipsUp, int testPipsDown, int maxPlacementDistance, int longStabilizerSizeFactor, int shortStabilizerSizeFactor, int longBalancerSizeFactor, int shortBalancerSizeFactor, int primerSizeFactor,
             int balancerStopLossPips, int securePips, bool autoLotIncrease, int autoLotSafeEQLevel, bool tradeMidTerm, int takeProfit, int fixedSpread, int extraLongBuffer, int extraShortBuffer, double usePoint, bool autoCloseExtremes, int warningLevel,
             int heartbeatMonitorTimer, int databaseLogTimer, bool runBalancers, bool runStabilizers, bool runBreakouts, bool runPrimers, bool runWhiplash, bool isSymbolMaster, string dataFolder, int gmtOffset, int rateDecimalNumbersToShow, 
@@ -139,7 +150,7 @@ namespace Pragmatic.Client.Hourglass.MT4
                 // 2. Return the AccountId, StepGrowthFactor, StartingBalance, StartFactor and LastUpdate, plus the Alerts from API
                 if (response1 != null)
                 {
-                    // 3. Add recieved data to static Account entity
+                    // 3. Add received data to static Account entity
                     account.Id = response1.Id;
                     account.StepGrowthFactor = response1.StepGrowthFactor;
                     account.StartingBalance = response1.StartingBalance;
@@ -150,7 +161,7 @@ namespace Pragmatic.Client.Hourglass.MT4
 
                 // 4. Get the LastUpdate from the API using AccountId
                 // This works to get the last ClosedOrderTime for specific account, but it is probably not the correct way to do it. Ought to be better to just return the int from the API.
-                var response2 = await api.GetForAppAsync<int, IEnumerable<int>>(DependencyInjectionService.ApiName, account.Id, options =>
+                var response2 = await api.GetForAppAsync<int, SimpleResultDTO<long>>(DependencyInjectionService.ApiName, account.Id, options =>
                 {
                     options.RelativePath = "accounts/last";
                 });
@@ -158,12 +169,14 @@ namespace Pragmatic.Client.Hourglass.MT4
 
                 if (response2 != null)
                 {
-                    var lastUpdate = response2.FirstOrDefault();
+                    return response2.Result;
                 }
-
+                return -13;
+   
             }
             catch (Exception ex)
             {
+                logger?.LogError(ex, "Trader.RegisterAccount exception: ");
                 //int stop = 0;
             }
 
