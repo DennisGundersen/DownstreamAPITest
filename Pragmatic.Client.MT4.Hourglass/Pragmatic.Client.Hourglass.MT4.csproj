@@ -28,6 +28,7 @@
 		<IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
 		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<UserSecretsId>171e6452-26e5-4144-abc4-7a80514469a0</UserSecretsId>
 	</PropertyGroup>
 	
   <ItemGroup>
@@ -50,11 +51,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DNNE" Version="2.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="2.13.2" />
-    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="2.13.2" />
-    <PackageReference Include="NReco.Logging.File" Version="1.1.6" />
+    <PackageReference Include="DNNE" Version="2.0.5" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.15.1" />
+    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="2.15.1" />
+    <PackageReference Include="NReco.Logging.File" Version="1.1.7" />
   </ItemGroup>
 
   <ItemGroup>
