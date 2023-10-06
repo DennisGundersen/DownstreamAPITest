@@ -1,4 +1,4 @@
-﻿namespace Pragmatic.Client.MT4.Hourglass.Services
+﻿namespace Pragmatic.Client.Hourglass.MT4.Services
 {
     public interface IMappingService
     {

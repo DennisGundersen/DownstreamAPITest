@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Identity.Abstractions;
 using Microsoft.Identity.Web;
-using Pragmatic.Client.MT4.Hourglass.Extensions;
+using Pragmatic.Client.Hourglass.MT4.Extensions;
 using Pragmatic.Common.Services;
 using System;
 using System.IO;
 using System.Reflection;
 
-namespace Pragmatic.Client.MT4.Hourglass.Services
+namespace Pragmatic.Client.Hourglass.MT4.Services
 {
     public static class DependencyInjectionService
     {

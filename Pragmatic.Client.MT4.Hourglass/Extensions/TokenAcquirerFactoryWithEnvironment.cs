@@ -2,7 +2,7 @@
 using Microsoft.Identity.Web;
 using System;
 
-namespace Pragmatic.Client.MT4.Hourglass.Extensions
+namespace Pragmatic.Client.Hourglass.MT4.Extensions
 {
     internal class TokenAcquirerFactoryWithEnvironment : TokenAcquirerFactory
     {

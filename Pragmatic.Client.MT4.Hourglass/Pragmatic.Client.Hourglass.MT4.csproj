@@ -58,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Pragmatic.Common.Entities\Pragmatic.Common.Entities.csproj" />
     <ProjectReference Include="..\Pragmatic.Common.Services\Pragmatic.Common.Services.csproj" />
   </ItemGroup>
 

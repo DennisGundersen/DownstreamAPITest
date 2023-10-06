@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Internal;
 
-namespace Pragmatic.Client.MT4.Hourglass.Extensions
+namespace Pragmatic.Client.Hourglass.MT4.Extensions
 {
     internal class FileLoggerFactory<T> : ILogger<T> where T : class
     {

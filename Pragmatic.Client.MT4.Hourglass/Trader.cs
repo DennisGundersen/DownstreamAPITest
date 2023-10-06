@@ -1,20 +1,23 @@
 ﻿using Azure;
+using DNNE;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Abstractions;
 using Microsoft.Identity.Web;
 using NReco.Logging.File;
-using Pragmatic.Client.MT4.Hourglass.Extensions;
-using Pragmatic.Client.MT4.Hourglass.Models;
-using Pragmatic.Client.MT4.Hourglass.Services;
+using Pragmatic.Client.Hourglass.MT4.Extensions;
+using Pragmatic.Client.Hourglass.MT4.Models;
+using Pragmatic.Client.Hourglass.MT4.Services;
+using Pragmatic.Common.Entities.DTOs;
+using Pragmatic.Common.Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace Pragmatic.Client.MT4.Hourglass
+namespace Pragmatic.Client.Hourglass.MT4
 {
     public static class Trader
     {
@@ -23,19 +26,61 @@ namespace Pragmatic.Client.MT4.Hourglass
         private static IDownstreamApi api;
         private static ILogger logger;
         private static ILoggerProvider loggerProvider;
+        public static Account account { get; set; }
+
+
+        //[UnmanagedCallersOnly(EntryPoint = "GetStringLength")]
+        //public unsafe static int GetStringLength([C99Type("wchar_t *")] char* a)
+        //{
+        //    string b = new string(a);
+        //    return b.Length;
+        //}
 
         [UnmanagedCallersOnly(EntryPoint = "RegisterAccountFromMT4")]
-        public static int RegisterAccountFromMT4(int value, int pause = 3)
+        public unsafe static int RegisterAccountFromMT4(int accountNumber,
+            [C99Type("wchar_t *")] char* accountName,
+            double tradingLotSize, double extremeTopRate, double normalTopRate,
+            double preferredCenterRate, double normalBottomRate, double extremeBottomRate,
+            double testUpToRate, double testDownToRate, int testPipsUp, int testPipsDown,
+            int maxPlacementDistance,
+            int longStabilizerSizeFactor, int shortStabilizerSizeFactor,
+            int longBalancerSizeFactor, int shortBalancerSizeFactor, int primerSizeFactor,
+            int balancerStopLossPips, int securePips,
+            byte autoLotIncrease, int autoLotSafeEQLevel, byte tradeMidTerm,
+            int takeProfit, int fixedSpread, int extraLongBuffer, int extraShortBuffer,
+            double usePoint, byte autoCloseExtremes, int warningLevel,
+            int heartbeatMonitorTimer, int databaseLogTimer, byte runBalancers,
+            byte runStabilizers, byte runBreakouts, byte runPrimers, byte runWhiplash,
+            byte isSymbolMaster, [C99Type("wchar_t *")] char* dataFolder,
+            int gmtOffset, int rateDecimalNumbersToShow, double ask, double bid, double accountPercentage, double maxWeight,
+            int balMinPlacementLongs, int balMinPlacementShorts)
         {
+            string accountNameString = new string(accountName);
+            string dataFolderString = new string(dataFolder);
+            bool autoLotIncreaseBool = MQL4Converter.ReadBool(autoLotIncrease);
+            bool tradeMidTermBool = MQL4Converter.ReadBool(tradeMidTerm);
+            bool autoCloseExtremesBool = MQL4Converter.ReadBool(autoCloseExtremes);
+            bool runBalancersBool = MQL4Converter.ReadBool(runBalancers);
+            bool runStabilizersBool = MQL4Converter.ReadBool(runStabilizers);
+            bool runBreakoutsBool = MQL4Converter.ReadBool(runBreakouts);
+            bool runPrimersBool = MQL4Converter.ReadBool(runPrimers);
+            bool runWhiplashBool = MQL4Converter.ReadBool(runWhiplash);
+            bool isSymbolMasterBool = MQL4Converter.ReadBool(isSymbolMaster);
+
             try
             {
                 // Setup all the services
                 PrepareEnvironment();
-                logger?.LogInformation("({0}, {1}) = {2}", value, pause, value + pause);
+                //logger?.LogInformation("({0}: {1})", accountNumber, accountName);
+                logger?.LogInformation(accountNameString);
 
                 mapper = provider.GetRequiredService<IMappingService>();
 
-                Task<int> task = Task.Run<int>(async () => await RegisterAccount());
+                Task<int> task = Task.Run<int>(async () => await RegisterAccount(accountNumber, accountNameString, tradingLotSize, extremeTopRate, normalTopRate, preferredCenterRate, normalBottomRate, extremeBottomRate,
+                        testUpToRate, testDownToRate, testPipsUp, testPipsDown, maxPlacementDistance, longStabilizerSizeFactor, shortStabilizerSizeFactor, longBalancerSizeFactor, shortBalancerSizeFactor, primerSizeFactor,
+                        balancerStopLossPips, securePips, autoLotIncreaseBool, autoLotSafeEQLevel, tradeMidTermBool, takeProfit, fixedSpread, extraLongBuffer, extraShortBuffer, usePoint, autoCloseExtremesBool, warningLevel,
+                        heartbeatMonitorTimer, databaseLogTimer, runBalancersBool, runStabilizersBool, runBreakoutsBool, runPrimersBool, runWhiplashBool, isSymbolMasterBool, dataFolderString, gmtOffset, rateDecimalNumbersToShow,
+                        ask, bid, accountPercentage, maxWeight, balMinPlacementLongs, balMinPlacementShorts));
 
                 return task.Result;
             }
@@ -47,24 +92,31 @@ namespace Pragmatic.Client.MT4.Hourglass
                 }
                 logger?.LogCritical(ex, "RegisterAccountFromMT4 Exception: ");
             }
-            return -1;
+            return -11;
         }
 
 
-        //public static async Task<int> GetIntManagedAsync(int value, int pause = 3)
-        //{
-        //    await Task.Delay(pause * 1000);
-        //    return value + pause;
-        //    //var values = await RegisterAccount();
-        //    //return values;//.ToList().Count;
-        //}
-
-
-        public static async Task<int> RegisterAccount()
+        // TODO:
+        // 0. Transform the incoming data to an Account entity
+        // 1. Send in registration request to API with DTO including the AccountNumber and AccountName plus Variables
+        // 2. Return the AccountId, StepGrowthFactor, StartingBalance, StartFactor and LastUpdate, plus the Alerts from API
+        // 3. Add recieved data to static Account entity
+        // 4. Get the LastUpdate from the API using AccountId
+        // 5. Return the LastUpdate int (or error) to MT4 EA
+        public static async Task<int> RegisterAccount(int accountNumber, string accountName, double tradingLotSize, double extremeTopRate, double normalTopRate, double preferredCenterRate, double normalBottomRate, double extremeBottomRate,
+            double testUpToRate, double testDownToRate, int testPipsUp, int testPipsDown, int maxPlacementDistance, int longStabilizerSizeFactor, int shortStabilizerSizeFactor, int longBalancerSizeFactor, int shortBalancerSizeFactor, int primerSizeFactor,
+            int balancerStopLossPips, int securePips, bool autoLotIncrease, int autoLotSafeEQLevel, bool tradeMidTerm, int takeProfit, int fixedSpread, int extraLongBuffer, int extraShortBuffer, double usePoint, bool autoCloseExtremes, int warningLevel,
+            int heartbeatMonitorTimer, int databaseLogTimer, bool runBalancers, bool runStabilizers, bool runBreakouts, bool runPrimers, bool runWhiplash, bool isSymbolMaster, string dataFolder, int gmtOffset, int rateDecimalNumbersToShow, 
+            double ask, double bid, double accountPercentage, double maxWeight, int balMinPlacementLongs, int balMinPlacementShorts)
         {
+            if (account == null)
+            {
+                account = new Account();
+            }
+
+            // If called from CLI instead of MT4 EA
             if (logger == null || provider == null || mapper == null)
             {
-                // Called from CLI instead of MT4 EA
                 PrepareEnvironment();
                 mapper = provider.GetRequiredService<IMappingService>();
             }
@@ -72,59 +124,52 @@ namespace Pragmatic.Client.MT4.Hourglass
             // Get the services needed for this method
             api = provider.GetRequiredService<IDownstreamApi>();
 
-            var model = new ValueModel() { Id = 1, Name = "This is a test" };
+            // TODO: Transform the incoming data to an AccountRegistrationDTO
+            var accountRegistrationDTO = new AccountRegistrationDTO() { AccountNumber = 123, AccountName = "Test Account" };
 
             try
             {
-                var response = await api.PostForAppAsync<ValueModel, ValueModel>(DependencyInjectionService.ApiName, model,
+                // 1. Send in registration request to API with DTO including the AccountNumber and AccountName plus Variables
+                var response1 = await api.PostForAppAsync<AccountRegistrationDTO, Account>(DependencyInjectionService.ApiName, accountRegistrationDTO,
                     options =>
                     {
                         options.RelativePath = "accounts/register";
                     });
-
-                if (response != null)
+                // 2. Return the AccountId, StepGrowthFactor, StartingBalance, StartFactor and LastUpdate, plus the Alerts from API
+                if (response1 != null)
                 {
-                    int stop = 0;
+                    // 3. Add recieved data to static Account entity
+                    account.Id = response1.Id;
+                    account.StepGrowthFactor = response1.StepGrowthFactor;
+                    account.StartingBalance = response1.StartingBalance;
+                    account.StartFactor = response1.StartFactor;
+                    account.Alerts.Clear();
+                    account.Alerts = response1.Alerts;
                 }
 
-                var response2 = await api.GetForAppAsync<IEnumerable<ValueModel>>(DependencyInjectionService.ApiName, options =>
+                // 4. Get the LastUpdate from the API using AccountId
+                // This works to get the last ClosedOrderTime for specific account, but it is probably not the correct way to do it. Ought to be better to just return the int from the API.
+                var response2 = await api.GetForAppAsync<int, IEnumerable<int>>(DependencyInjectionService.ApiName, account.Id, options =>
                 {
-                    options.RelativePath = "accounts/get";
+                    options.RelativePath = "accounts/last";
                 });
-                
+
+
                 if (response2 != null)
                 {
-                    int stop = 0;
+                    var lastUpdate = response2.FirstOrDefault();
                 }
 
             }
             catch (Exception ex)
             {
-                int stop = 0;
-
+                //int stop = 0;
             }
 
-            //var values = await GetValues();
-
-            ////TODO: Must make sure the AccountID and LastUpdate is returned from the API before returning the result to the MT4 EA
-            //// Currently the CLI project just prints reulsts = System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Int32,Pragmatic.Client.MT4.Hourglass.Trader+<RegisterAccount>d__5]
-            //if (values.ToList().Count > 0)
-            //{
-            //    bool success = true;
-            //}
-            //return values.ToList().Count;
-            return -1;
+            return -1; // Account not registered, return error code
         }
 
-        public static async Task<IEnumerable<ValueModel>> GetValues()
-        {
-            var result = await api.GetForAppAsync<IEnumerable<ValueModel>>(DependencyInjectionService.ApiName, options =>
-            {
-                options.RelativePath = "Values";
-            });
 
-            return result;
-        }
 
         private static void PrepareEnvironment()
         {
@@ -140,5 +185,25 @@ namespace Pragmatic.Client.MT4.Hourglass
                 provider = DependencyInjectionService.RegisterDependencyInjection(loggerProvider);
             }
         }
+
+
+        //public static async Task<IEnumerable<ValueModel>> GetValues()
+        //{
+        //    var result = await api.GetForAppAsync<IEnumerable<ValueModel>>(DependencyInjectionService.ApiName, options =>
+        //    {
+        //        options.RelativePath = "Values";
+        //    });
+
+        //    return result;
+        //}
+
+
+        //public static async Task<int> GetIntManagedAsync(int value, int pause = 3)
+        //{
+        //    await Task.Delay(pause * 1000);
+        //    return value + pause;
+        //    //var values = await RegisterAccount();
+        //    //return values;//.ToList().Count;
+        //}
     }
 }

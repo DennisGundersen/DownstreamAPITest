@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pragmatic.Client.MT4.Hourglass.Models
+namespace Pragmatic.Client.Hourglass.MT4.Models
 {
     public class ValueModel : IDisposable
     {

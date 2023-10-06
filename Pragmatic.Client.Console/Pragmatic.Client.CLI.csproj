@@ -17,7 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Pragmatic.Client.MT4.Hourglass\Pragmatic.Client.MT4.Hourglass.csproj" />
+	  <ProjectReference Include="..\Pragmatic.Client.MT4.Hourglass\Pragmatic.Client.Hourglass.MT4.csproj" />
 	</ItemGroup>
 
 </Project>

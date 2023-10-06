@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pragmatic.Client.MT4.Hourglass.Services
+namespace Pragmatic.Client.Hourglass.MT4.Services
 {
     public class MappingService : IMappingService
     {
