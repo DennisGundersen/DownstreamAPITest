@@ -59,7 +59,7 @@ namespace Pragmatic.Client.CLI
         static async Task Main(string[] args)
         {
             //var result = Trader.RegisterAccountFromMT4(2, 4);
-            var result = Trader.RegisterAccount(accountNumber, accountName, tradingLotSize, extremeTopRate, normalTopRate, preferredCenterRate, normalBottomRate, extremeBottomRate,
+            var result = await Trader.RegisterAccount(accountNumber, accountName, tradingLotSize, extremeTopRate, normalTopRate, preferredCenterRate, normalBottomRate, extremeBottomRate,
                         testUpToRate, testDownToRate, testPipsUp, testPipsDown, maxPlacementDistance, longStabilizerSizeFactor, shortStabilizerSizeFactor, longBalancerSizeFactor, shortBalancerSizeFactor, primerSizeFactor,
                         balancerStopLossPips, securePips, autoLotIncrease, autoLotSafeEQLevel, tradeMidTerm, takeProfit, fixedSpread, extraLongBuffer, extraShortBuffer, usePoint, autoCloseExtremes, warningLevel,
                         heartbeatMonitorTimer, databaseLogTimer, runBalancers, runStabilizers, runBreakouts, runPrimers, runWhiplash, isSymbolMaster, dataFolder, gmtOffset, rateDecimalNumbersToShow,
