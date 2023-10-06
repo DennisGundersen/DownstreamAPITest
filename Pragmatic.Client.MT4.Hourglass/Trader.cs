@@ -55,6 +55,7 @@ namespace Pragmatic.Client.Hourglass.MT4
             int gmtOffset, int rateDecimalNumbersToShow, double ask, double bid, double accountPercentage, double maxWeight,
             int balMinPlacementLongs, int balMinPlacementShorts)
         {
+            // Convert the incoming data from MT4 to C# types
             string accountNameString = new string(accountName);
             string dataFolderString = new string(dataFolder);
             bool autoLotIncreaseBool = MQL4Converter.ReadBool(autoLotIncrease);
