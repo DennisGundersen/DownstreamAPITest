@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pragmatic.Common.Entities.DTOs;
 using Pragmatic.Common.Entities.Entities;
 using Pragmatic.Core.API.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -48,11 +49,12 @@ namespace Pragmatic.Core.API.Controllers
 
         // GET: api/accounts
         [HttpGet("last")]
-        public ActionResult<IEnumerable<int>> GetLastClose(int accountId)
+        public ActionResult<SimpleResultDTO<long>> GetLastClose(int accountId)
         {
-            int lastClose = 0;
-            // TODO: Get the last ClosedOrderTime for specific account (if it exisits), convert it to UNIX time and return it, otherwise return 0
-            return new List<int> { lastClose };
+            long lastClose = 0;
+            if (accountId == 100000) lastClose = DateTime.UtcNow.Ticks;
+            // TODO: Get the last ClosedOrderTime for specific account (if it exists), convert it to UNIX time and return it, otherwise return 0
+            return new SimpleResultDTO<long> { Result = lastClose };
         }
 
     }

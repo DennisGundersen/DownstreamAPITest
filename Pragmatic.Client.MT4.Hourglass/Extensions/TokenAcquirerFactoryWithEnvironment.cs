@@ -13,8 +13,8 @@ namespace Pragmatic.Client.Hourglass.MT4.Extensions
             string basePath = DefineConfiguration(builder);
             builder.SetBasePath(basePath)
                    .AddJsonFile("appsettings.json", optional: true)
-                   .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-                   .AddEnvironmentVariables();
+                   .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true);
+                   //.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
 
